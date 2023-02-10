@@ -1,0 +1,20 @@
+## for inner directories
+.env
+*.env
+*.env.local
+*.env
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+*/node_modules
+*/*/node_modules
+*/*/.env
+*/*/.gitignore
+/node_modules
+/client/node_modules
+/client/.env
+/client/.gitignore
+/server/node_modules
+/server/.env
+/server/.gitignore
