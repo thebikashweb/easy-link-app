@@ -1,0 +1,25 @@
+.appbar{
+	padding:20px;
+}
+.appbar__inner{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.appbar__inner img{
+	width:100%;
+	height:100%;
+	max-width:85px;
+	max-height:30px;
+	object-fit: contain;
+}
+.appbar__menus{
+	display: flex;
+}
+.appbar__menus h3{
+	color:var(--lightGrey);
+	margin-left: 20px;
+}
+.appbar__menus h3.active{
+	color:var(--darkBlack);
+}
