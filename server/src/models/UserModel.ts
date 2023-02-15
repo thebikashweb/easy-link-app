@@ -1,25 +1,19 @@
 import mongoose from "mongoose";
 
-const UrlSchema = new mongoose.Schema({
-  urlCode: {
+const UserSchema = new mongoose.Schema({
+  fullName: {
+    type: String,
+    required: true,
+  },
+  email: {
     type: String,
     required: true,
     unique: true,
     index: true,
   },
-  originalLink: {
+  password: {
     type: String,
     required: true,
-    unique: true,
-    index: true,
-  },
-  name: {
-    type: String,
-    required: false,
-  },
-  visitCount: {
-    type: Number,
-    default: 0,
   },
   createdAt: {
     type: String,
@@ -31,7 +25,7 @@ const UrlSchema = new mongoose.Schema({
   },
 });
 
-UrlSchema.set("toJSON", {
+UserSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
   transform: function (doc, ret) {
@@ -39,4 +33,4 @@ UrlSchema.set("toJSON", {
   },
 });
 
-export default mongoose.model("Url", UrlSchema);
+export default mongoose.model("User", UserSchema);
