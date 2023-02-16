@@ -1,7 +1,8 @@
 import React from "react";
-import axios from "axios";
 import TextInput from "../../components/TextInput/TextInput";
 import Button from "../../components/Button/Button";
+
+import httpClient from "../../Services/httpClient";
 
 import "./Dashboard.css";
 
@@ -19,10 +20,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const { data } = await axios.post(
-        "http://localhost:5001/api/url",
-        urlPayload
-      );
+      const { data } = await httpClient.post("url", urlPayload);
       console.log("data from back-end", data);
       setShortUrl(`http://localhost:5001/api/url/${data.urlCode}`);
     } catch (error) {
@@ -49,12 +47,14 @@ const Dashboard = () => {
         <TextInput
           label="Original Url"
           placeholder="https://google.com/test/12"
+          value={urlPayload.originalLink}
           onChange={(val) =>
             setUrlPayload({ ...urlPayload, originalLink: val.toLocaleString() })
           }
         />
         <TextInput
           label="Name"
+          value={urlPayload.name}
           placeholder="Online shopping"
           onChange={(val) =>
             setUrlPayload({ ...urlPayload, name: val.toLocaleString() })

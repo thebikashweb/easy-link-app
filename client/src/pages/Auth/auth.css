@@ -1,0 +1,29 @@
+.auth{
+	width:100%;
+	padding:20px;
+	margin:auto;
+	margin-top:120px;
+	max-width: 400px;
+	text-align: center;
+}
+
+.auth img{
+	width:100%;
+	max-width:170px;
+	object-fit: contain;
+	margin-bottom: 30px;;
+}
+.auth__form >div{
+	text-align: left;
+	margin-bottom:20px;
+}
+
+.auth__action{
+	text-align: center;
+	margin-top:30px;
+
+}
+.auth__action .button{
+	width:100%;
+	margin-bottom:10px;
+}
