@@ -33,4 +33,4 @@ UserSchema.set("toJSON", {
   },
 });
 
-export default mongoose.model("User", UserSchema);
+export default mongoose.model("users", UserSchema);

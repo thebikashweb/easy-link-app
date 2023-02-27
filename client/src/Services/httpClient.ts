@@ -6,6 +6,6 @@ let accessToken = localStorage.getItem("accessToken");
 export default axios.create({
   baseURL: "http://localhost:5001/api/",
   headers: {
-    Authorization: `Bearer ${accessToken}`,
+    authorization: `Bearer ${accessToken}`,
   },
 });

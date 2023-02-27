@@ -1,11 +1,16 @@
 import express, { Router, NextFunction, Request, Response } from "express";
 
 import Url from "../models/UrlModel";
-import { createUrl, getUrlByUrlCode } from "../services/urlServices";
+import {
+  createUrl,
+  getUrlByUrlCode,
+  getUrlsForUser,
+} from "../services/urlServices";
+import { verifyAccessToken } from "../middlewares/authToken";
 
 const router = Router();
 
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", verifyAccessToken, async (req: Request, res: Response) => {
   //TODO you can move this to a seperate controller
   //TODO add validation here
 
@@ -17,7 +22,7 @@ router.post("/", async (req: Request, res: Response) => {
       if (urlData) {
         res.status(200).json(urlData);
       } else {
-        const data = await createUrl(req.body);
+        const data = await createUrl({ ...req.body, userId: req["user"].id });
         res.status(201).json(data);
       }
     } catch (error) {
@@ -37,7 +42,28 @@ router.get("/:urlCode", async (req: Request, res: Response) => {
   try {
     const data = await getUrlByUrlCode(urlCode);
     res.status(301).redirect(data.originalLink);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json("Internal server error");
+  }
 });
+
+router.get(
+  "/user/:userId",
+  verifyAccessToken,
+  async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    if (userId !== req["user"].id) {
+      res.status(401).json("Access denied");
+      return;
+    }
+
+    try {
+      const data = await getUrlsForUser(userId);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json("Internal server error");
+    }
+  }
+);
 
 export default router;

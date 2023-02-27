@@ -1,11 +1,12 @@
 import { generate as generateUrlcode } from "generate-password";
 
-import { UrlPayloadType } from "../types";
+import { UrlPayloadType, UrlType } from "../types";
 import Url from "../models/UrlModel";
 
 //create
 export const createUrl = async (payload: UrlPayloadType) => {
-  if (!payload.originalLink) throw Error("Missing required paramaters");
+  if (!payload.originalLink || !payload.userId)
+    throw Error("Missing required paramaters");
   try {
     let url = new Url(payload);
 
@@ -18,6 +19,7 @@ export const createUrl = async (payload: UrlPayloadType) => {
     url.urlCode = urlCode;
 
     url = await url.save();
+
     return url;
   } catch (error) {
     Error(error);
@@ -35,5 +37,15 @@ export const getUrlByUrlCode = async (urlCode: string) => {
   } catch (error) {
     console.log(error);
     Error(error);
+  }
+};
+
+export const getUrlsForUser = async (userId: string) => {
+  try {
+    const urls = await Url.find({ userId: userId }).exec();
+    console.log("urls", urls);
+    return urls;
+  } catch (error) {
+    throw new Error("Interal server error");
   }
 };
