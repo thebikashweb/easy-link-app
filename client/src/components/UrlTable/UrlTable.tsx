@@ -18,7 +18,7 @@ interface Props {
   rows: Row[]; // An array of rows
 }
 const UrlTable: React.FC<Props> = ({ columns, rows }) => {
-  const [isMobile, setIsMobile] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 769);
 
   React.useEffect(() => {
     const handleWindowSize = (e: UIEvent) => {

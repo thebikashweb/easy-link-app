@@ -8,6 +8,7 @@ type Props = {
   onChange: (val: string | number) => void;
   type?: "text" | "password";
   value: string;
+  style?: {};
 };
 
 const TextInput: React.FC<Props> = ({
@@ -16,9 +17,10 @@ const TextInput: React.FC<Props> = ({
   onChange,
   type = "text",
   value,
+  style,
 }) => {
   return (
-    <div className="text-input">
+    <div className="text-input" style={style}>
       {Boolean(label) && <label htmlFor="">{label}</label>}
       <input
         type={type}

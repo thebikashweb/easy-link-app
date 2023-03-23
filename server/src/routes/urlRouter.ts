@@ -3,8 +3,10 @@ import express, { Router, NextFunction, Request, Response } from "express";
 import Url from "../models/UrlModel";
 import {
   createUrl,
+  deleteUrlByUrlCode,
   getUrlByUrlCode,
   getUrlsForUser,
+  updateUrlCode,
 } from "../services/urlServices";
 import { verifyAccessToken } from "../middlewares/authToken";
 
@@ -59,6 +61,40 @@ router.get(
 
     try {
       const data = await getUrlsForUser(userId);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json("Internal server error");
+    }
+  }
+);
+
+router.put(
+  "/:urlCode",
+  verifyAccessToken,
+  async (req: Request, res: Response) => {
+    const urlCode = req.params.urlCode;
+    if (!urlCode) {
+      res.status(400).send("Bad request");
+    }
+    try {
+      const udpatedData = await updateUrlCode(req.body);
+      res.status(200).json(udpatedData);
+    } catch (error) {
+      res.status(500).json("Internal server error");
+    }
+  }
+);
+
+router.delete(
+  "/:urlCode",
+  verifyAccessToken,
+  async (req: Request, res: Response) => {
+    const urlCode = req.params.urlCode;
+    if (!urlCode) {
+      res.status(400).send("Bad request");
+    }
+    try {
+      const data = await deleteUrlByUrlCode(urlCode);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json("Internal server error");

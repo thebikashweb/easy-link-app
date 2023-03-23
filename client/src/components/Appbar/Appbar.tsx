@@ -18,7 +18,11 @@ const Appbar = () => {
           <h3 className="active">Dashboard</h3>
           <h3>Profile</h3>
           {isLoggedIn ? (
-            <Button label="logout" onClick={() => logout(navigate)} />
+            <Button
+              label="logout"
+              variant="outlined-secondary"
+              onClick={() => logout(navigate)}
+            />
           ) : (
             ""
           )}

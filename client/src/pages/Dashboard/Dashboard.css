@@ -5,6 +5,11 @@
     text-align: center;
 }
 
+.dashboard__addNew{
+	width: 100%;
+	text-align: right;
+}
+
 .dashboard__empty-state p{
 	margin-bottom: 16px;
 }

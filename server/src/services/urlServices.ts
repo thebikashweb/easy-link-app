@@ -30,10 +30,42 @@ export const createUrl = async (payload: UrlPayloadType) => {
 export const getUrlByUrlCode = async (urlCode: string) => {
   try {
     let data = await Url.findOne({ urlCode });
-    if (!data) throw Error("Bad request");
     data.visitCount = data.visitCount + 1;
-    data.update(data);
-    return data;
+    return await Url.findOneAndUpdate({ urlCode: urlCode }, data);
+  } catch (error) {
+    console.log(error);
+    Error(error);
+  }
+};
+
+export const updateUrlCode = async (payload: Partial<UrlType>) => {
+  if (!payload.urlCode) throw Error("Invalid urlCode");
+  try {
+    let data = await Url.findOne({ urlCode: payload.urlCode });
+
+    //editable column restriction
+    const editableColumn: Array<Partial<keyof UrlType>> = [
+      "name",
+      "originalLink",
+    ];
+
+    Object.keys(payload).forEach((key: any) => {
+      if (editableColumn.includes(key)) {
+        data[key] = payload[key];
+      }
+    });
+
+    return await Url.findOneAndUpdate({ urlCode: payload.urlCode }, data);
+  } catch (error) {
+    console.log(error);
+    Error(error);
+  }
+};
+
+export const deleteUrlByUrlCode = async (urlCode: string) => {
+  try {
+    const deleted = await Url.deleteOne({ urlCode });
+    return "Deleted successfully";
   } catch (error) {
     console.log(error);
     Error(error);

@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import Modal from "react-modal";
 import TextInput from "../../components/TextInput/TextInput";
 import Button from "../../components/Button/Button";
 import UrlTable from "../../components/UrlTable/UrlTable";
@@ -8,7 +9,12 @@ import httpClient from "../../Services/httpClient";
 
 import "./Dashboard.css";
 import { UrlType } from "../../types";
-import { deleteUrlByUrlCode, getUrlsForUser } from "../../Services/urlServices";
+import {
+  createUrl,
+  deleteUrlByUrlCode,
+  getUrlsForUser,
+  updateUrlCode,
+} from "../../Services/urlServices";
 
 const Dashboard = () => {
   const [showUrlAddView, setShowUrlAddView] = React.useState(false);
@@ -16,21 +22,18 @@ const Dashboard = () => {
     originalLink: "",
     name: "",
   });
-  const [shortUrl, setShortUrl] = React.useState("");
   const [userUrlData, setUserUrlData] = React.useState<Array<UrlType>>([]);
+  const [editUrlData, setEditUrlData] = React.useState<Partial<UrlType>>();
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
 
   const postDataToApi = async () => {
     if (!urlPayload.originalLink) {
       alert("Please provide original url");
       return;
     }
-    try {
-      const { data } = await httpClient.post("url", urlPayload);
-      console.log("data from back-end", data);
-      setShortUrl(`http://localhost:5001/api/url/${data.urlCode}`);
-    } catch (error) {
-      console.log(error);
-    }
+    await createUrl(urlPayload);
+    fetchUrlsForUser();
+    setShowUrlAddView(false);
   };
 
   //Fetch urls for users
@@ -47,6 +50,7 @@ const Dashboard = () => {
   React.useEffect(() => {
     fetchUrlsForUser();
   }, []);
+
   const renderEmptyState = () => {
     return (
       <div className="dashboard__empty-state">
@@ -57,6 +61,79 @@ const Dashboard = () => {
           variant="outlined-primary"
         />
       </div>
+    );
+  };
+  const renderAddNewButton = () => {
+    if (showUrlAddView) return;
+    return (
+      <div className="dashboard__addNew">
+        <Button
+          onClick={() => setShowUrlAddView(true)}
+          label="Create a new short url"
+          variant="primary"
+        />
+      </div>
+    );
+  };
+
+  const renderEditModal = () => {
+    const onCancel = () => {
+      setIsEditDialogOpen(false);
+      setEditUrlData({});
+    };
+    return (
+      <Modal
+        isOpen={isEditDialogOpen}
+        onRequestClose={onCancel}
+        style={modalStyle}
+      >
+        <h3 style={{ marginBottom: 20 }}>Edit {editUrlData?.name}</h3>
+        <TextInput
+          style={{ marginBottom: 10 }}
+          label="Original Url"
+          placeholder="https://google.com/test/12"
+          value={editUrlData?.originalLink || ""}
+          onChange={(val) =>
+            setEditUrlData({
+              ...editUrlData,
+              originalLink: val.toLocaleString(),
+            })
+          }
+        />
+        <TextInput
+          label="Name"
+          placeholder="Another short url"
+          value={editUrlData?.name || ""}
+          onChange={(val) =>
+            setEditUrlData({
+              ...editUrlData,
+              name: val.toLocaleString(),
+            })
+          }
+        />
+        <div
+          style={{ marginTop: 20, display: "flex", flexDirection: "column" }}
+        >
+          <Button
+            label="Update"
+            onClick={async () => {
+              if (editUrlData?.urlCode) {
+                await updateUrlCode(editUrlData);
+                alert("Updated successfully");
+                fetchUrlsForUser();
+                onCancel();
+              }
+            }}
+            variant="outlined-primary"
+            style={{ marginBottom: 10 }}
+          />
+          <Button
+            label="Cancel"
+            onClick={onCancel}
+            variant="outlined-secondary"
+          />
+        </div>
+      </Modal>
     );
   };
 
@@ -96,15 +173,20 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {showUrlAddView ? renderAddNewUrl() : renderEmptyState()}
-      {Boolean(shortUrl) && <h3>{shortUrl}</h3>}
-      <h3>Shortened url list</h3>
-      <>
-        <UrlTable
-          columns={tableColumn}
-          rows={userUrlData.map(convertRowDataToTableData)}
-        />
-      </>
+      {showUrlAddView && renderAddNewUrl()}
+      {Boolean(userUrlData.length) ? renderAddNewButton() : renderEmptyState()}
+
+      {Boolean(userUrlData.length) && (
+        <>
+          {renderEditModal()} <h3>Shortened url list</h3>
+          <UrlTable
+            columns={tableColumn}
+            rows={userUrlData.map((_) =>
+              convertRowDataToTableData(_, setEditUrlData, setIsEditDialogOpen)
+            )}
+          />
+        </>
+      )}
     </div>
   );
 };
@@ -117,12 +199,18 @@ const tableColumn = [
   { label: "Actions", field: "actions", hideLabelinMobile: true },
 ];
 
-const convertRowDataToTableData = (data: UrlType) => {
+const convertRowDataToTableData = (
+  data: UrlType,
+  setEditUrlData: React.Dispatch<
+    React.SetStateAction<Partial<UrlType> | undefined>
+  >,
+  setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
+) => {
   return {
     ...data,
     urlCode: `http://localhost:5001/api/url/${data.urlCode}`,
     createdAt: moment.unix(Number(data.createdAt) / 1000).format("l"),
-    actions: renderActions(data),
+    actions: renderActions(data, setEditUrlData, setIsEditDialogOpen),
   };
 };
 //delete url
@@ -130,7 +218,13 @@ const deleteUrl = async (urlCode: string) => {
   await deleteUrlByUrlCode(urlCode);
 };
 
-const renderActions = (data: UrlType): React.ReactNode => {
+const renderActions = (
+  data: UrlType,
+  setEditUrlData: React.Dispatch<
+    React.SetStateAction<Partial<UrlType> | undefined>
+  >,
+  setIsEditDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
+): React.ReactNode => {
   return (
     <div
       style={{
@@ -142,15 +236,39 @@ const renderActions = (data: UrlType): React.ReactNode => {
       <Button
         label="Edit"
         variant="outlined-primary"
-        onClick={() => console.log(data)}
+        onClick={() => {
+          setEditUrlData(data);
+          setIsEditDialogOpen(true);
+        }}
       />
       <Button
         label="Delete"
         variant="outlined-secondary"
-        onClick={() => deleteUrl(data.urlCode)}
+        onClick={() => {
+          if (
+            window.confirm(`Are you sure you want to delete: ${data.name}?`)
+          ) {
+            deleteUrl(data.urlCode);
+          }
+        }}
       />
     </div>
   );
+};
+const modalStyle = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    maxWidth: 500,
+    width: "100%",
+    transform: "translate(-50%, -50%)",
+  },
+  overlay: {
+    background: "rgba(0, 0, 0, .5)",
+  },
 };
 
 export default Dashboard;
