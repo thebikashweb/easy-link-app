@@ -1,55 +1,32 @@
 import React from "react";
 import moment from "moment";
+import { observer } from "mobx-react";
 import Modal from "react-modal";
 import TextInput from "../../components/TextInput/TextInput";
 import Button from "../../components/Button/Button";
 import UrlTable from "../../components/UrlTable/UrlTable";
 
-import httpClient from "../../Services/httpClient";
-
 import "./Dashboard.css";
 import { UrlType } from "../../types";
-import {
-  createUrl,
-  deleteUrlByUrlCode,
-  getUrlsForUser,
-  updateUrlCode,
-} from "../../Services/urlServices";
+import { updateUrlCode } from "../../Services/urlServices";
+import urlStore from "../../store/urlStore";
 
-const Dashboard = () => {
-  const [showUrlAddView, setShowUrlAddView] = React.useState(false);
-  const [urlPayload, setUrlPayload] = React.useState({
-    originalLink: "",
-    name: "",
-  });
-  const [userUrlData, setUserUrlData] = React.useState<Array<UrlType>>([]);
+const Dashboard = observer(() => {
   const [editUrlData, setEditUrlData] = React.useState<Partial<UrlType>>();
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
-
-  const postDataToApi = async () => {
-    if (!urlPayload.originalLink) {
-      alert("Please provide original url");
-      return;
-    }
-    await createUrl(urlPayload);
-    fetchUrlsForUser();
-    setShowUrlAddView(false);
-  };
-
-  //Fetch urls for users
-  const fetchUrlsForUser = async () => {
-    try {
-      const urlData = await getUrlsForUser();
-
-      setUserUrlData(urlData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const {
+    urlData,
+    urlDataLoading,
+    newUrlPayload,
+    init,
+    createNewUrl,
+    showUrlAddView,
+    setShowUrlAddView,
+  } = urlStore;
 
   React.useEffect(() => {
-    fetchUrlsForUser();
-  }, []);
+    init();
+  }, [init]);
 
   const renderEmptyState = () => {
     return (
@@ -120,7 +97,7 @@ const Dashboard = () => {
               if (editUrlData?.urlCode) {
                 await updateUrlCode(editUrlData);
                 alert("Updated successfully");
-                fetchUrlsForUser();
+                urlStore.fetchUrlsForUser();
                 onCancel();
               }
             }}
@@ -143,23 +120,23 @@ const Dashboard = () => {
         <TextInput
           label="Original Url"
           placeholder="https://google.com/test/12"
-          value={urlPayload.originalLink}
+          value={newUrlPayload.originalLink}
           onChange={(val) =>
-            setUrlPayload({ ...urlPayload, originalLink: val.toLocaleString() })
+            (newUrlPayload.originalLink = val.toLocaleString())
           }
         />
         <TextInput
           label="Name"
-          value={urlPayload.name}
+          value={newUrlPayload.name || ""}
           placeholder="Online shopping"
-          onChange={(val) =>
-            setUrlPayload({ ...urlPayload, name: val.toLocaleString() })
-          }
+          onChange={(val) => (newUrlPayload.name = val.toLocaleString())}
         />
         <div className="dashboard__add-new-actions">
           <Button
             label="Generate a short url"
-            onClick={() => postDataToApi()}
+            onClick={() => {
+              createNewUrl();
+            }}
           />
           <Button
             label="Cancel"
@@ -174,14 +151,15 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       {showUrlAddView && renderAddNewUrl()}
-      {Boolean(userUrlData.length) ? renderAddNewButton() : renderEmptyState()}
+      {Boolean(urlData.length) ? renderAddNewButton() : renderEmptyState()}
+      {urlDataLoading && <h2>Loading...</h2>}
 
-      {Boolean(userUrlData.length) && (
+      {Boolean(urlData.length) && !urlDataLoading && (
         <>
           {renderEditModal()} <h3>Shortened url list</h3>
           <UrlTable
             columns={tableColumn}
-            rows={userUrlData.map((_) =>
+            rows={urlData.map((_) =>
               convertRowDataToTableData(_, setEditUrlData, setIsEditDialogOpen)
             )}
           />
@@ -189,7 +167,7 @@ const Dashboard = () => {
       )}
     </div>
   );
-};
+});
 
 const tableColumn = [
   { label: "Name", field: "name" },
@@ -212,10 +190,6 @@ const convertRowDataToTableData = (
     createdAt: moment.unix(Number(data.createdAt) / 1000).format("l"),
     actions: renderActions(data, setEditUrlData, setIsEditDialogOpen),
   };
-};
-//delete url
-const deleteUrl = async (urlCode: string) => {
-  await deleteUrlByUrlCode(urlCode);
 };
 
 const renderActions = (
@@ -248,7 +222,7 @@ const renderActions = (
           if (
             window.confirm(`Are you sure you want to delete: ${data.name}?`)
           ) {
-            deleteUrl(data.urlCode);
+            urlStore.deleteUrl(data.urlCode);
           }
         }}
       />
