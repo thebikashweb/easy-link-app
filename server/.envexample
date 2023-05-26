@@ -1,1 +1,4 @@
 PORT=5001
+MONGO_URL='mongodb+srv://<admin>:<password>@<serverlocation>'
+JWT_SECRET=asdfasd
+SESSION_SECRET=asdfa

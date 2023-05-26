@@ -1,0 +1,36 @@
+.main-table{
+	width:100%;
+	margin:auto;
+	
+}
+.main-table table{
+	border-spacing: 0px;
+}
+.main-table thead{
+	background-color: var(--lightBackground);
+	font-size: 20px;
+	color:var(--darkBlack);
+}
+thead th{
+	font-weight: 400;
+}
+.main-table tbody tr{
+	color:var(--lightGrey);
+	font-size:16px;
+	margin-top:20px;
+}
+.main-table td{
+	font-weight: 400;
+}
+
+.mobile-table thead{
+	margin-bottom:20px;
+}
+.mobile-table tr{
+	display: flex;
+	align-items: center;
+	padding:5px;
+}
+.mobile-table h3{
+	margin-right:10px;
+}
