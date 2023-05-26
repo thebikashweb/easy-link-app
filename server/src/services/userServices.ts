@@ -36,3 +36,42 @@ export const loginUser = async (
     throw Error(error);
   }
 };
+
+export const getUserById = async (id: string): Promise<Partial<UserType>> => {
+  const user = await User.findById(id);
+  if (!user) throw new Error("User does not exist");
+  return {
+    id: user.id,
+    fullName: user.fullName,
+    avatar: user.avatar,
+    email: user.email,
+  };
+};
+
+export const updateUser = async (
+  userId: string,
+  payload: Partial<UserType>
+) => {
+  try {
+    let data = await User.findById(userId);
+
+    //editable column restriction
+    const editableColumn: Array<Partial<keyof UserType>> = [
+      "fullName",
+      "avatar",
+    ];
+
+    Object.keys(payload).forEach((key: any) => {
+      if (editableColumn.includes(key)) {
+        data[key] = payload[key];
+      }
+    });
+
+    const user = await User.findOneAndUpdate({ email: data.email }, data);
+
+    return "updated";
+  } catch (error) {
+    console.log(error);
+    Error(error);
+  }
+};

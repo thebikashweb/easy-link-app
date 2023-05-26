@@ -3,7 +3,7 @@ import React from "react";
 import "./Appbar.css";
 import useAuth from "../../util/useAuth";
 import Button from "../Button/Button";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../Services/authServices";
 
 const Appbar = () => {
@@ -15,8 +15,11 @@ const Appbar = () => {
         <img src={`${process.env.PUBLIC_URL}/assets/images/logo.png`} alt="" />
 
         <div className="appbar__menus">
-          <h3 className="active">Dashboard</h3>
-          <h3>Profile</h3>
+          <Link className="active" to="/">
+            Dashboard{" "}
+          </Link>
+          <Link to="/profile">Profile </Link>
+
           {isLoggedIn ? (
             <Button
               label="logout"
