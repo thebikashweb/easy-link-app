@@ -5,6 +5,7 @@ export type UserType = {
   password: string;
   createdAt: string;
   updatedAt: string;
+  avatar: string;
 };
 export type UserRegisterPayloadType = {
   fullName: string;
