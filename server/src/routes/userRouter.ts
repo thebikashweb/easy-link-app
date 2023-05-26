@@ -1,8 +1,13 @@
 import { Router, NextFunction, Request, Response } from "express";
 
-import { createUser, loginUser } from "../services/userServices";
+import {
+  createUser,
+  getUserById,
+  loginUser,
+  updateUser,
+} from "../services/userServices";
 import User from "../models/UserModel";
-import { getAuthToken } from "../middlewares/authToken";
+import { getAuthToken, verifyAccessToken } from "../middlewares/authToken";
 import { UserLoginPayloadType, UserRegisterPayloadType } from "types";
 
 const router = Router();
@@ -44,6 +49,41 @@ router.post(
       } else {
         res.status(403).json("Invalid email/password");
       }
+    }
+  }
+);
+
+router.get(
+  "/:userId",
+  verifyAccessToken,
+  async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+      res.status(400).send("Bad request");
+    }
+    const user = await getUserById(userId);
+    res.status(200).json(user);
+  }
+);
+
+router.put(
+  "/:userId",
+  verifyAccessToken,
+  async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+      res.status(400).send("Bad request");
+    }
+    if (userId !== req["user"].id) {
+      res.status(403).send("Unauthorized");
+    }
+    try {
+      const udpatedData = await updateUser(userId, req.body);
+      res.status(200).json(udpatedData);
+    } catch (error) {
+      res.status(500).json("Internal server error");
     }
   }
 );

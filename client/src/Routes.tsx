@@ -5,6 +5,7 @@ import Login from "./pages/Auth/Login";
 import Signup from "./pages/Auth/Signup";
 import PrivateRoutes from "./components/RouteRestriction/PrivateRoutes";
 import PublicRoutes from "./components/RouteRestriction/PublicRoutes";
+import Profile from "./pages/Profile/Profile";
 
 const MainRoutes = () => (
   <Routes>
@@ -12,6 +13,7 @@ const MainRoutes = () => (
     <Route path="/" element={<PrivateRoutes />}>
       <Route path="/" element={<Navigate replace to="dashboard" />} />
       <Route path="dashboard" element={<Dashboard />} />
+      <Route path="profile" element={<Profile />} />
     </Route>
 
     <Route path="" element={<PublicRoutes />}>
