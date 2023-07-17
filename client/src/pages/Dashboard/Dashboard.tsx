@@ -10,6 +10,7 @@ import "./Dashboard.css";
 import { UrlType } from "../../types";
 import { updateUrlCode } from "../../Services/urlServices";
 import urlStore from "../../store/urlStore";
+import snackBarStore from "../../components/common/Snackbar/store/snackBarStore";
 
 const Dashboard = observer(() => {
   const [editUrlData, setEditUrlData] = React.useState<Partial<UrlType>>();
@@ -96,7 +97,8 @@ const Dashboard = observer(() => {
             onClick={async () => {
               if (editUrlData?.urlCode) {
                 await updateUrlCode(editUrlData);
-                alert("Updated successfully");
+                snackBarStore.showSnackBar("Updated successfully");
+
                 urlStore.fetchUrlsForUser();
                 onCancel();
               }
