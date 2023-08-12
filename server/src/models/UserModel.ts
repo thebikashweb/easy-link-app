@@ -23,6 +23,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  resetToken: {
+    type: String,
+    default: "",
+  },
   updatedAt: {
     type: String,
     default: Date.now(),
