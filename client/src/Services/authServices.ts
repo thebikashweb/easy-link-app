@@ -2,6 +2,7 @@ import httpClient from "./httpClient";
 
 import { UserLoginPayloadType, UserRegisterPayloadType } from "../types";
 import { NavigateFunction } from "react-router-dom";
+import snackBarStore from "../components/common/Snackbar/store/snackBarStore";
 export const signup = async (
   payload: UserRegisterPayloadType,
   redirectTo: NavigateFunction
@@ -10,8 +11,13 @@ export const signup = async (
     const { data } = await httpClient.post("user", payload);
     storeAccessTokenToLocal(data.accessToken);
     redirectTo("/dashboard");
-  } catch (error) {
-    //TODO error handling and showing error to UI
+    snackBarStore.showSnackBar("Signup success", "success");
+  } catch (error: any) {
+    snackBarStore.showSnackBar(
+      `Problem in Singup: ${error.response.data}`,
+      "error"
+    );
+
     console.log(error);
   }
 };
@@ -23,8 +29,13 @@ export const login = async (
     const { data } = await httpClient.post("user/login", payload);
     storeAccessTokenToLocal(data.accessToken);
     redirectTo("/dashboard");
-  } catch (error) {
-    //TODO error handling and showing error to UI
+    snackBarStore.showSnackBar("Login success", "success");
+  } catch (error: any) {
+    snackBarStore.showSnackBar(
+      `Problem in login: ${error.response.data}`,
+      "error"
+    );
+
     console.log(error);
   }
 };

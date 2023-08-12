@@ -5,6 +5,7 @@ import {
   deleteUrlByUrlCode,
   getUrlsForUser,
 } from "../Services/urlServices";
+import snackBarStore from "../components/common/Snackbar/store/snackBarStore";
 
 class UrlStore {
   urlData: Array<UrlType> = [];
@@ -53,6 +54,7 @@ class UrlStore {
   deleteUrl = async (urlCode: string) => {
     await deleteUrlByUrlCode(urlCode);
     this.fetchUrlsForUser();
+    snackBarStore.showSnackBar("Deleted Successfully", "success");
   };
 
   setUrlData = (data: Array<UrlType>) => (this.urlData = data);
