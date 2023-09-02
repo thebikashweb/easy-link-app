@@ -11,6 +11,7 @@ import {
 import User from "../models/UserModel";
 import {
   getAuthToken,
+  handleRefreshToken,
   verifyAccessToken,
   veryResetToken,
 } from "../middlewares/authToken";
@@ -92,5 +93,7 @@ router.post(
     }
   }
 );
+
+router.get("/refresh-token", handleRefreshToken);
 
 export default router;

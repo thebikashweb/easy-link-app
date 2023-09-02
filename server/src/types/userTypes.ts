@@ -23,3 +23,7 @@ export type PasswordReset = {
   password: string;
   token: string;
 };
+
+export type DecodedRefreshToken = {
+  email: string;
+};
