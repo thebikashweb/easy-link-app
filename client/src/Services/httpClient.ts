@@ -1,17 +1,16 @@
 import axios from "axios";
 import { handleRefreshToken } from "./authServices";
 
-let accessToken = localStorage.getItem("accessToken");
-let refreshToken = localStorage.getItem("refreshToken");
-
 axios.defaults.baseURL = "http://localhost:5001/api/";
 
 axios.interceptors.request.use(
   function (config) {
-    if (accessToken) {
-      config.headers["authorization"] = `Bearer ${accessToken}`;
-      config.headers["refresh_token"] = refreshToken || "";
-    }
+    config.headers["authorization"] = `Bearer ${localStorage.getItem(
+      "accessToken"
+    )}`;
+    config.headers["refresh_token"] =
+      localStorage.getItem("refreshToken") || "";
+
     return config;
   },
   function (error) {
@@ -33,12 +32,13 @@ axios.interceptors.response.use(
 
     if (
       error.response.status === 401 &&
-      originalRequest.url.includes("auth/refresh-token")
+      originalRequest.url.includes("refresh-token")
     ) {
       //this means refresh token route is being called and refresh token is invalid
       //clear everything and show whatever the message needed
       //TODO redirect to logout route
       //TODO clear all the access and refresh token
+      return Promise.reject(error);
     } else if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
