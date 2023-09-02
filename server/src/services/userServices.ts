@@ -5,6 +5,7 @@ import {
 } from "../types";
 import User from "../models/UserModel";
 import { compareHash, createHash } from "../util/hash";
+import { generateResetToken } from "../middlewares/authToken";
 
 export const createUser = async (
   payload: UserRegisterPayloadType
@@ -34,6 +35,41 @@ export const loginUser = async (
     return user;
   } catch (error) {
     throw Error(error);
+  }
+};
+
+export const handleForgotPassword = async (email: string): Promise<boolean> => {
+  try {
+    const user = await User.findOne({ email: email });
+    //create a reset token
+    const resetToken = generateResetToken(user);
+
+    user.resetToken = resetToken;
+    await User.findOneAndUpdate({ email: email }, user);
+
+    //send email with reset link to user
+    console.log(
+      "Reset link",
+      `http://localhost:3000/reset-password?resetToken=${resetToken}`
+    );
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const resetPassword = async (
+  newPassword: string,
+  email: string
+): Promise<boolean> => {
+  try {
+    const user = await User.findOne({ email: email });
+    user.password = createHash(newPassword);
+    user.resetToken = "";
+    await User.findOneAndUpdate({ email: email }, user);
+    return true;
+  } catch (error) {
+    throw new Error(error);
   }
 };
 

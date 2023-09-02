@@ -45,6 +45,10 @@ const Login = () => {
           <p>
             No account yet? <Link to="/signup">Signup</Link>{" "}
           </p>
+          <p>
+            {" "}
+            <Link to="/forgot-password">Forgot password?</Link>{" "}
+          </p>
         </div>
       </div>
     </div>

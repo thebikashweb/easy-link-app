@@ -6,6 +6,7 @@ export type UserType = {
   createdAt: string;
   updatedAt: string;
   avatar: string;
+  resetToken: string;
 };
 export type UserRegisterPayloadType = {
   fullName: string;
@@ -15,4 +16,9 @@ export type UserRegisterPayloadType = {
 export type UserLoginPayloadType = {
   email: string;
   password: string;
+};
+
+export type PasswordReset = {
+  password: string;
+  token: string;
 };

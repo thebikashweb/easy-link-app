@@ -40,6 +40,46 @@ export const login = async (
   }
 };
 
+export const forgotPassword = async (email: string): Promise<boolean> => {
+  try {
+    await httpClient.post("auth/forgot-password", { email });
+    snackBarStore.showSnackBar("Instruction sent successfully", "success");
+    return true;
+  } catch (error: any) {
+    snackBarStore.showSnackBar(`Prblem: ${error.response.data}`, "error");
+
+    console.log(error);
+    return false;
+  }
+};
+export const verifyToken = async (token: string): Promise<boolean> => {
+  try {
+    await httpClient.post("auth/verify-token", { token });
+    return true;
+  } catch (error: any) {
+    snackBarStore.showSnackBar(`Prblem: ${error.response.data}`, "error");
+
+    console.log(error);
+    return false;
+  }
+};
+
+export const resetPassword = async (
+  token: string,
+  password: string
+): Promise<boolean> => {
+  try {
+    await httpClient.post("auth/reset-password", { token, password });
+    snackBarStore.showSnackBar("Reset successfully", "success");
+    return true;
+  } catch (error: any) {
+    snackBarStore.showSnackBar(`Prblem: ${error.response.data}`, "error");
+
+    console.log(error);
+    return false;
+  }
+};
+
 export const logout = (redirectTo: NavigateFunction) => {
   localStorage.removeItem("accessToken");
   redirectTo("/login");

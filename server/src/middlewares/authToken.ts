@@ -21,6 +21,39 @@ const generateAccessToken = (user: UserType): string => {
     }
   );
 };
+export const generateResetToken = (user: UserType): string => {
+  return jwt.sign(
+    {
+      email: user.email,
+      id: user.id,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "24h",
+    }
+  );
+};
+export const veryResetToken = async (
+  token: string
+): Promise<boolean | string> => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(
+      token,
+      JWT_SECRET,
+      async (err: any, decoded: { email: string; id: string }) => {
+        if (err) {
+          resolve(false);
+        } else {
+          try {
+            resolve(decoded.email);
+          } catch (error) {
+            resolve(false);
+          }
+        }
+      }
+    );
+  });
+};
 
 export const getAuthToken = async (req: Request, res: Response) => {
   const user = req["user"] as UserType;
