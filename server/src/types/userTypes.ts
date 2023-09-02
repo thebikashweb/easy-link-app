@@ -7,6 +7,7 @@ export type UserType = {
   updatedAt: string;
   avatar: string;
   resetToken: string;
+  refreshToken: string;
 };
 export type UserRegisterPayloadType = {
   fullName: string;
@@ -21,4 +22,8 @@ export type UserLoginPayloadType = {
 export type PasswordReset = {
   password: string;
   token: string;
+};
+
+export type DecodedRefreshToken = {
+  email: string;
 };
