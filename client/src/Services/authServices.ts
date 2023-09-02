@@ -10,6 +10,7 @@ export const signup = async (
   try {
     const { data } = await httpClient.post("user", payload);
     storeAccessTokenToLocal(data.accessToken);
+    storeRefreshTokenToLocal(data.refreshToken);
     redirectTo("/dashboard");
     snackBarStore.showSnackBar("Signup success", "success");
   } catch (error: any) {
@@ -28,6 +29,7 @@ export const login = async (
   try {
     const { data } = await httpClient.post("user/login", payload);
     storeAccessTokenToLocal(data.accessToken);
+    storeRefreshTokenToLocal(data.refreshToken);
     redirectTo("/dashboard");
     snackBarStore.showSnackBar("Login success", "success");
   } catch (error: any) {
@@ -46,7 +48,7 @@ export const forgotPassword = async (email: string): Promise<boolean> => {
     snackBarStore.showSnackBar("Instruction sent successfully", "success");
     return true;
   } catch (error: any) {
-    snackBarStore.showSnackBar(`Prblem: ${error.response.data}`, "error");
+    snackBarStore.showSnackBar(`Problem: ${error.response.data}`, "error");
 
     console.log(error);
     return false;
@@ -57,7 +59,7 @@ export const verifyToken = async (token: string): Promise<boolean> => {
     await httpClient.post("auth/verify-token", { token });
     return true;
   } catch (error: any) {
-    snackBarStore.showSnackBar(`Prblem: ${error.response.data}`, "error");
+    snackBarStore.showSnackBar(`Problem: ${error.response.data}`, "error");
 
     console.log(error);
     return false;
@@ -80,10 +82,24 @@ export const resetPassword = async (
   }
 };
 
+export const handleRefreshToken = async () => {
+  try {
+    const { data } = await httpClient.get("auth/refresh-token");
+    storeAccessTokenToLocal(data.accessToken);
+    storeRefreshTokenToLocal(data.refreshToken);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const logout = (redirectTo: NavigateFunction) => {
   localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+
   redirectTo("/login");
 };
 
 const storeAccessTokenToLocal = (accessToken: string): void =>
   localStorage.setItem("accessToken", accessToken);
+const storeRefreshTokenToLocal = (refreshToken: string): void =>
+  localStorage.setItem("refreshToken", refreshToken);

@@ -17,7 +17,7 @@ const generateAccessToken = (user: UserType): string => {
     },
     JWT_SECRET,
     {
-      expiresIn: "60s",
+      expiresIn: "10s",
     }
   );
 };
@@ -40,7 +40,7 @@ export const generateRefreshToken = async (user: UserType): Promise<string> => {
     },
     JWT_SECRET,
     {
-      expiresIn: "5d",
+      expiresIn: "1d",
     }
   );
   user.refreshToken = token;
