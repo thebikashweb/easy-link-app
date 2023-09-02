@@ -7,6 +7,7 @@ export type UserType = {
   updatedAt: string;
   avatar: string;
   resetToken: string;
+  refreshToken: string;
 };
 export type UserRegisterPayloadType = {
   fullName: string;
