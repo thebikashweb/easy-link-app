@@ -8,7 +8,10 @@ export type UserType = {
   avatar: string;
   resetToken: string;
   refreshToken: string;
+  role: UserRole;
 };
+
+export type UserRole = "user" | "admin";
 export type UserRegisterPayloadType = {
   fullName: string;
   email: string;

@@ -35,6 +35,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: Date.now(),
   },
+  role: {
+    type: String,
+    default: "user",
+  },
 });
 
 UserSchema.set("toJSON", {

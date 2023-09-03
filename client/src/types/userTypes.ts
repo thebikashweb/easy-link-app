@@ -6,7 +6,9 @@ export type UserType = {
   createdAt: string;
   updatedAt: string;
   avatar: string;
+  role: UserRole;
 };
+export type UserRole = "user" | "admin";
 export type UserRegisterPayloadType = {
   fullName: string;
   email: string;
