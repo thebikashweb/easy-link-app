@@ -95,6 +95,7 @@ export const updateUser = async (
     const editableColumn: Array<Partial<keyof UserType>> = [
       "fullName",
       "avatar",
+      "role",
     ];
 
     Object.keys(payload).forEach((key: any) => {

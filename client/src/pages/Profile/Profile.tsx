@@ -5,6 +5,8 @@ import "./Profile.css";
 import userStore from "../../store/userStore";
 import TextInput from "../../components/TextInput/TextInput";
 import Button from "../../components/Button/Button";
+import SelectInput from "../../components/common/SelectInput/SelectInput";
+import { UserRole } from "../../types";
 const Profile = observer(() => {
   const [isEditing, setIsEditing] = React.useState(false);
 
@@ -28,6 +30,12 @@ const Profile = observer(() => {
         value={user.fullName || ""}
         onChange={(val) => (user.fullName = val.toString())}
       />
+      <SelectInput
+        label="User role"
+        value={user.role || "user"}
+        options={userRoleOption}
+        onChange={(val) => (user.role = val.toString() as UserRole)}
+      />
     </>
   );
   const renderProfile = () => (
@@ -40,6 +48,11 @@ const Profile = observer(() => {
       <p>{user.email}</p>
     </div>
   );
+
+  const userRoleOption: Array<{ label: string; value: UserRole }> = [
+    { label: "Admin", value: "admin" },
+    { label: "User", value: "user" },
+  ];
   return (
     <div className="profile-page">
       <h3>Profile page</h3>
