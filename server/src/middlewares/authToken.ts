@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 import { JWT_SECRET } from "../util";
 
-import { DecodedRefreshToken, UserType } from "../types";
+import { DecodedRefreshToken, UserRole, UserType } from "../types";
 import User from "../models/UserModel";
 
 //generate access token
@@ -14,10 +14,11 @@ const generateAccessToken = (user: UserType): string => {
       email: user.email,
       isLoggedIn: true,
       id: user.id,
+      role: user.role,
     },
     JWT_SECRET,
     {
-      expiresIn: "10s",
+      expiresIn: "10m",
     }
   );
 };
@@ -108,6 +109,19 @@ export const verifyAccessToken = async (
     }
   });
 };
+
+export const isRoleRequired =
+  (roleRequired: UserRole) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (roleRequired !== req["user"].role) {
+        return res.status(403).send({ message: "Access denied" });
+      }
+      next();
+    } catch (error) {
+      return res.status(403).send({ message: error });
+    }
+  };
 
 export const handleRefreshToken = async (
   req: Request,

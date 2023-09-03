@@ -8,7 +8,7 @@ import {
   getUrlsForUser,
   updateUrlCode,
 } from "../services/urlServices";
-import { verifyAccessToken } from "../middlewares/authToken";
+import { isRoleRequired, verifyAccessToken } from "../middlewares/authToken";
 
 const router = Router();
 
@@ -71,6 +71,7 @@ router.get(
 router.put(
   "/:urlCode",
   verifyAccessToken,
+  isRoleRequired("admin"),
   async (req: Request, res: Response) => {
     const urlCode = req.params.urlCode;
     if (!urlCode) {
@@ -88,6 +89,7 @@ router.put(
 router.delete(
   "/:urlCode",
   verifyAccessToken,
+  isRoleRequired("admin"),
   async (req: Request, res: Response) => {
     const urlCode = req.params.urlCode;
     if (!urlCode) {

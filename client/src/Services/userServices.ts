@@ -2,6 +2,7 @@ import httpClient from "./httpClient";
 
 import { getAuthUser } from "../util/useAuth";
 import { UserType } from "../types";
+import { handleRefreshToken } from "./authServices";
 
 export const getUserById = async (
   id?: string
@@ -9,6 +10,7 @@ export const getUserById = async (
   const userId = id || getAuthUser()?.id;
   try {
     const { data } = await httpClient.get(`user/${userId}`);
+
     return data;
   } catch (error) {
     //TODO error handling and showing error to UI
@@ -20,6 +22,7 @@ export const getUserById = async (
 export const updateUser = async (payload: Partial<UserType>) => {
   try {
     const { data } = await httpClient.put(`user/${payload.id}`, payload);
+    handleRefreshToken();
     return data;
   } catch (error) {
     //TODO error handling and showing error to UI

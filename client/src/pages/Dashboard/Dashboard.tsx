@@ -11,6 +11,7 @@ import { UrlType } from "../../types";
 import { updateUrlCode } from "../../Services/urlServices";
 import urlStore from "../../store/urlStore";
 import snackBarStore from "../../components/common/Snackbar/store/snackBarStore";
+import ProtectedComponent from "../../components/common/Restriction/ProtectedComponent";
 
 const Dashboard = observer(() => {
   const [editUrlData, setEditUrlData] = React.useState<Partial<UrlType>>();
@@ -45,11 +46,13 @@ const Dashboard = observer(() => {
     if (showUrlAddView) return;
     return (
       <div className="dashboard__addNew">
-        <Button
-          onClick={() => setShowUrlAddView(true)}
-          label="Create a new short url"
-          variant="primary"
-        />
+        <ProtectedComponent requiredRole="user">
+          <Button
+            onClick={() => setShowUrlAddView(true)}
+            label="Create a new short url"
+            variant="primary"
+          />
+        </ProtectedComponent>
       </div>
     );
   };
@@ -209,25 +212,27 @@ const renderActions = (
         justifyContent: "space-between",
       }}
     >
-      <Button
-        label="Edit"
-        variant="outlined-primary"
-        onClick={() => {
-          setEditUrlData(data);
-          setIsEditDialogOpen(true);
-        }}
-      />
-      <Button
-        label="Delete"
-        variant="outlined-secondary"
-        onClick={() => {
-          if (
-            window.confirm(`Are you sure you want to delete: ${data.name}?`)
-          ) {
-            urlStore.deleteUrl(data.urlCode);
-          }
-        }}
-      />
+      <ProtectedComponent requiredRole="admin">
+        <Button
+          label="Edit"
+          variant="outlined-primary"
+          onClick={() => {
+            setEditUrlData(data);
+            setIsEditDialogOpen(true);
+          }}
+        />
+        <Button
+          label="Delete"
+          variant="outlined-secondary"
+          onClick={() => {
+            if (
+              window.confirm(`Are you sure you want to delete: ${data.name}?`)
+            ) {
+              urlStore.deleteUrl(data.urlCode);
+            }
+          }}
+        />
+      </ProtectedComponent>
     </div>
   );
 };

@@ -81,6 +81,7 @@ export const getUserById = async (id: string): Promise<Partial<UserType>> => {
     fullName: user.fullName,
     avatar: user.avatar,
     email: user.email,
+    role: user.role,
   };
 };
 
